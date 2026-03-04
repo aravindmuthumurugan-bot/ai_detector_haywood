@@ -1,0 +1,15 @@
+# Python 3.10+ | CUDA 12.4 | NVIDIA L40S
+# Install: pip install -r requirements.txt
+
+# ── GPU Inference runtime (NO PyTorch / TensorFlow) ──────────────────────────
+onnxruntime-gpu==1.20.1
+numpy>=1.23.0,<2.0.0
+Pillow>=9.5.0
+
+# ── One-time model export only (CPU torch — skip if model already exported) ──
+# Exports haywoodsloan/ai-image-detector-deploy → ONNX, then torch is unused.
+# Run: python gpu_test.py --export
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.3.1+cpu
+transformers==4.44.2
+optimum[onnxruntime]==1.21.0
