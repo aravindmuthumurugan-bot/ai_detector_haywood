@@ -7,9 +7,8 @@ numpy>=1.23.0,<2.0.0
 Pillow>=9.5.0
 
 # ── One-time model export only (CPU torch — skip if model already exported) ──
-# Exports haywoodsloan/ai-image-detector-deploy → ONNX, then torch is unused.
+# Uses torch.onnx directly — no optimum needed (avoids swinv2 unsupported error).
 # Run: python gpu_test.py --export
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.3.1+cpu
-transformers>=4.40.0,<=4.42.4
-optimum[onnxruntime]==1.21.0
+transformers>=4.40.0

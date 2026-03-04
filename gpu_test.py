@@ -26,37 +26,60 @@ MATRI_ID           = "M12345"
 REJECTION_THRESHOLD = 0.65
 
 IMAGE_PATHS = [
-    r"Ai_images\Saloni.png",
-    r"Ai_images\Varun.png",
-    r"Ai_images\Anjali.png",
-    r"Ai_images\Priya (2).png",
-    r"Ai_images\Amit with family.png",
-    r"Ai_images\Gemini_Generated_Image_oxh2e9oxh2e9oxh2.png",
-    r"Real_images\IMG_20220814_174830.jpg",
-    r"Real_images\CHR4226900_Mrl620_TB_4.jpg",
-    r"Real_images\image (2).png",
+    "Ai_images/Saloni.png",
+    "Ai_images/Varun.png",
+    "Ai_images/Anjali.png",
+    "Ai_images/Priya (2).png",
+    "Ai_images/Amit with family.png",
+    "Ai_images/Gemini_Generated_Image_oxh2e9oxh2e9oxh2.png",
+    "Real_images/IMG_20220814_174830.jpg",
+    "Real_images/CHR4226900_Mrl620_TB_4.jpg",
+    "Real_images/image (2).png",
 ]
 
 # ──────────────────────────────────────────────────────────────────────────────
 
 
 def export_model():
-    print("Exporting haywoodsloan/ai-image-detector-deploy to ONNX...")
+    print("Exporting haywoodsloan/ai-image-detector-deploy to ONNX (via torch.onnx)...")
     try:
-        from optimum.onnxruntime import ORTModelForImageClassification
-        from transformers import AutoImageProcessor
+        import torch
+        from transformers import AutoImageProcessor, AutoModelForImageClassification
     except ImportError:
-        print("ERROR: Run first → pip install optimum[onnxruntime] transformers torch")
+        print("ERROR: Run first → pip install transformers torch")
         sys.exit(1)
 
-    model = ORTModelForImageClassification.from_pretrained(
-        "haywoodsloan/ai-image-detector-deploy",
-        export=True,
-    )
-    model.save_pretrained(ONNX_MODEL_DIR)
+    MODEL_NAME = "haywoodsloan/ai-image-detector-deploy"
+    os.makedirs(ONNX_MODEL_DIR, exist_ok=True)
 
-    processor = AutoImageProcessor.from_pretrained("haywoodsloan/ai-image-detector-deploy")
+    print("Loading model weights...")
+    processor = AutoImageProcessor.from_pretrained(MODEL_NAME)
+    model     = AutoModelForImageClassification.from_pretrained(MODEL_NAME)
+    model.eval()
+
+    # Save processor config and model config (needed at inference)
     processor.save_pretrained(ONNX_MODEL_DIR)
+    model.config.to_json_file(os.path.join(ONNX_MODEL_DIR, "config.json"))
+
+    # Dummy input — matches the center-crop size from preprocessor_config.json
+    crop_size   = processor.crop_size.get("height", 224) if hasattr(processor, "crop_size") and isinstance(processor.crop_size, dict) else 224
+    dummy_input = torch.randn(1, 3, crop_size, crop_size)
+
+    onnx_path = os.path.join(ONNX_MODEL_DIR, "model.onnx")
+    print(f"Exporting to {onnx_path} ...")
+    torch.onnx.export(
+        model,
+        dummy_input,
+        onnx_path,
+        export_params=True,
+        opset_version=17,
+        input_names=["pixel_values"],
+        output_names=["logits"],
+        dynamic_axes={
+            "pixel_values": {0: "batch_size"},
+            "logits":       {0: "batch_size"},
+        },
+    )
 
     print(f"\n✓ Model exported to '{ONNX_MODEL_DIR}/'")
     print("  Now run: python gpu_test.py")
