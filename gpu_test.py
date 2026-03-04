@@ -13,10 +13,29 @@ Usage:
 import os
 import sys
 import json
+import site
 import argparse
 import numpy as np
 from pathlib import Path
 from PIL import Image
+
+# ─── CUDA lib discovery (must run before onnxruntime is imported) ─────────────
+# Matches the LD_LIBRARY_PATH pattern from Dockerfile.base:
+#   nvidia/cudnn/lib, nvidia/cublas/lib, nvidia/cuda_runtime/lib
+def _setup_cuda_libs():
+    nvidia_pkgs = ["nvidia/cudnn/lib", "nvidia/cublas/lib", "nvidia/cuda_runtime/lib"]
+    extra = []
+    for sp in site.getsitepackages():
+        for pkg in nvidia_pkgs:
+            p = os.path.join(sp, pkg)
+            if os.path.isdir(p):
+                extra.append(p)
+    if extra:
+        current = os.environ.get("LD_LIBRARY_PATH", "")
+        os.environ["LD_LIBRARY_PATH"] = ":".join(extra) + (":" + current if current else "")
+
+_setup_cuda_libs()
+
 import onnxruntime as ort
 
 # ─── Configuration ────────────────────────────────────────────────────────────

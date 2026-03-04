@@ -2,6 +2,10 @@
 # Install: pip install -r requirements.txt
 
 # ── GPU Inference runtime (NO PyTorch / TensorFlow) ──────────────────────────
+# NVIDIA CUDA wheels — required for CUDAExecutionProvider (matches Dockerfile.base)
+nvidia-cuda-runtime-cu12
+nvidia-cublas-cu12
+nvidia-cudnn-cu12
 onnxruntime-gpu==1.20.1
 numpy>=1.23.0,<2.0.0
 Pillow>=9.5.0
