@@ -91,7 +91,8 @@ def export_model():
         dummy_input,
         onnx_path,
         export_params=True,
-        opset_version=17,
+        opset_version=16,          # opset 16 has better CUDA kernel coverage than 17
+        do_constant_folding=True,  # folds constants → fewer ops → removes CPU fallback triggers
         input_names=["pixel_values"],
         output_names=["logits"],
         dynamic_axes={
@@ -157,7 +158,7 @@ def create_session() -> ort.InferenceSession:
     cuda_options = {
         "device_id": 0,
         "arena_extend_strategy": "kSameAsRequested",
-        "cudnn_conv_algo_search": "DEFAULT",
+        "cudnn_conv_algo_search": "EXHAUSTIVE",  # searches all cuDNN kernels — fixes Conv fallback
     }
 
     session = ort.InferenceSession(
