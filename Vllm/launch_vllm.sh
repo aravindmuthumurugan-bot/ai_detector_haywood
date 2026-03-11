@@ -49,7 +49,7 @@ vllm serve "$MODEL_PATH" \
     --host 0.0.0.0 \
     --port "${VLLM_PORT:-8000}" \
     --max-model-len "${MAX_MODEL_LEN}" \
-    --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION:-0.85}" \
+    --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION:-0.60}" \
     --dtype "${VLLM_DTYPE:-auto}" \
     --tensor-parallel-size "${TENSOR_PARALLEL_SIZE:-1}" \
     --served-model-name "Qwen/Qwen3.5-9B"
