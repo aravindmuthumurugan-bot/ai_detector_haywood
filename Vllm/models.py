@@ -80,7 +80,7 @@ class ValidationResponse(BaseModel):
     summary: ValidationSummary
 
     total_processing_time_seconds: float
-    model_used: str = "Qwen/Qwen2.5-VL-7B-Instruct"
+    model_used: str = "Qwen/Qwen3.5-9B"
 
 
 # ---------------------------------------------------------------------------
