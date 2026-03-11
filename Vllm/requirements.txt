@@ -1,0 +1,30 @@
+# =============================================================================
+# Qwen3.5 vLLM Photo Validation Service — Python Dependencies
+# NOTE: torch + vllm are installed separately in setup.sh for GPU wheels.
+#       This file covers the remaining dependencies.
+# =============================================================================
+
+# vLLM (GPU wheel installed via setup.sh, listed here for pip install -r)
+vllm>=0.6.3
+
+# OpenAI Python client — used to call the vLLM OpenAI-compatible server
+openai>=1.30.0
+
+# Transformers (needed for tokenizer / processor in offline fallback mode)
+transformers>=4.50.0
+accelerate>=0.27.0
+huggingface-hub>=0.24.0
+
+# FastAPI stack
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+aiofiles>=23.2.1
+
+# Image processing
+Pillow>=10.0.0
+imagehash>=4.3.1       # perceptual hashing for within-batch duplicate detection
+
+# Config / utilities
+pydantic>=2.5.0
+python-dotenv>=1.0.0
