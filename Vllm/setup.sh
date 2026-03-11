@@ -27,15 +27,19 @@ nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
 log "GPU detected."
 
 # -----------------------------------------------------------------------------
-# 2. System dependencies
+# 2. System dependencies (requires sudo — skipped gracefully if not available)
 # -----------------------------------------------------------------------------
-log "Installing system packages..."
-apt-get update -qq
-apt-get install -y -qq \
-    python3-pip python3-dev python3-venv \
-    git wget curl \
-    libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev \
-    ffmpeg  # needed by some torch vision ops
+if command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
+    log "Installing system packages (sudo available)..."
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq \
+        python3-pip python3-dev python3-venv \
+        git wget curl \
+        libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev \
+        ffmpeg
+else
+    log "No sudo access — skipping system package install (assuming libs already present on GPU server)."
+fi
 
 # -----------------------------------------------------------------------------
 # 3. Python virtual environment (optional but recommended)
