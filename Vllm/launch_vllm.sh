@@ -37,11 +37,9 @@ PYEOF
 )
 
 if [ -z "${MAX_MODEL_LEN:-}" ]; then
-    if [ "$VRAM_GB" -ge 40 ] 2>/dev/null; then
-        MAX_MODEL_LEN=32768
-    else
-        MAX_MODEL_LEN=8192   # safe default for 24 GB GPUs
-    fi
+    # Photo validation needs ~2000 tokens max — 4096 is sufficient for all GPUs.
+    # Keeping this low saves ~17 GB of KV cache VRAM vs 32768.
+    MAX_MODEL_LEN=4096
 fi
 
 echo "[$(date +'%H:%M:%S')] GPU VRAM detected: ${VRAM_GB} GB — using max_model_len=${MAX_MODEL_LEN}"

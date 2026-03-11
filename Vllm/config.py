@@ -31,11 +31,10 @@ VLLM_API_KEY = os.getenv("VLLM_API_KEY", "not-needed")
 # ---------------------------------------------------------------------------
 # vLLM serve launch parameters (used by setup.sh / launch_vllm.sh)
 # ---------------------------------------------------------------------------
-# 8192 is safe for 24 GB GPUs (A10G / RTX 4090).
-# Set MAX_MODEL_LEN=32768 in .env for 40+ GB GPUs (A100).
-# Photo validation only needs ~4 000–6 000 tokens (image + prompt + output).
-MAX_MODEL_LEN = int(os.getenv("MAX_MODEL_LEN", "8192"))
-GPU_MEMORY_UTILIZATION = float(os.getenv("GPU_MEMORY_UTILIZATION", "0.85"))
+# Photo validation needs ~2000 tokens max (image + prompt + output).
+# 4096 is sufficient and reduces KV cache VRAM by ~17 GB vs 32768.
+MAX_MODEL_LEN = int(os.getenv("MAX_MODEL_LEN", "4096"))
+GPU_MEMORY_UTILIZATION = float(os.getenv("GPU_MEMORY_UTILIZATION", "0.60"))
 TENSOR_PARALLEL_SIZE = int(os.getenv("TENSOR_PARALLEL_SIZE", "1"))
 DTYPE = os.getenv("VLLM_DTYPE", "auto")
 ENFORCE_EAGER = os.getenv("ENFORCE_EAGER", "false").lower() == "true"
