@@ -100,6 +100,29 @@ async def health():
     },
     tags=["validation"],
     summary="Validate up to 10 photos for policy violations",
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "multipart/form-data": {
+                    "schema": {
+                        "type": "object",
+                        "required": ["unique_id", "gender", "age", "photos"],
+                        "properties": {
+                            "unique_id": {"type": "string", "description": "Unique user / profile identifier (e.g. matri ID)"},
+                            "gender": {"type": "string", "description": "Profile owner's gender — 'M' or 'F'"},
+                            "age": {"type": "integer", "description": "Profile owner's declared age"},
+                            "prompt": {"type": "string", "nullable": True, "description": "Additional validation guidelines or platform-specific rules"},
+                            "photos": {
+                                "type": "array",
+                                "items": {"type": "string", "format": "binary"},
+                                "description": "Photos to validate. Upload 1–10 images (JPEG / PNG / WEBP / BMP).",
+                            },
+                        },
+                    }
+                }
+            }
+        }
+    },
 )
 async def validate_photos(
     unique_id: str = Form(
